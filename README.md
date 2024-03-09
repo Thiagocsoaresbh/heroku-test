@@ -1,3 +1,65 @@
+
+# Simplified Banking System
+
+## About the Project
+
+This project aims to develop a simplified banking system supporting two types of users: customers and administrators. It is designed to allow customers to manage their finances through transactions and administrators to control deposits made by checks.
+
+## Technology Stack
+
+- **Backend**: Laravel 8.x, PHP 7.4 or higher
+- **Frontend**: Vue.js 3.x, Vite as a build tool
+- **Database**: PostgreSQL 13.x
+- **Authentication**: JWT (JSON Web Tokens) with Laravel Sanctum
+- **Testing**: PHPUnit for backend testing
+- **Image Storage**: Amazon S3
+- **Hosting**: Heroku
+
+## Database
+
+PostgreSQL is chosen for its robustness, performance, and advanced feature support, essential for the financial operations and management of this system.
+
+### Models and Relationships
+
+- **User**: Stores user information such as username, email, password (hash), and role (customer or administrator).
+- **Account**: Linked to a User, stores the account number and current balance.
+- **Transaction**: Related to an Account, records transactions including type (income, expense, deposit), amount, description, and date.
+- **Check**: Also linked to an Account, stores information about checks deposited, including amount, description, image path, and status (pending, accepted, rejected).
+
+## Backend (Laravel)
+
+The backend is responsible for business logic, authentication, database operations, and file system interactions (for image storage). It will implement a RESTful API for communication with the frontend.
+
+### Key Endpoints
+
+- **Authentication**: Registration, login, and user details
+- **Transactions**: Listing, recording expenses, and income
+- **Checks**: Submission for deposit, listing, and administrative operations for approval/rejection
+
+## Frontend (Vue.js)
+
+Developed with Vue.js, the frontend will provide an interactive interface for users, enabling them to perform banking operations intuitively and efficiently.
+
+## Author
+
+- **Name**: [Thiago Cesar Soares]
+- **GitHub**: [https://github.com/thiagocsoaresbh]
+- **LinkedIn**: [https://linkedin.com/in/thiago-csoares]
+
+## Contributions
+
+Guidelines for those wishing to contribute to the project, including how to submit bugs, request features, and the process for sending pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details.
+
+## Acknowledgments
+
+This README provides a comprehensive overview of the Simplified that Banking System project, detailing the technologies used, database structure, backend and frontend information.
+
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
@@ -62,5 +124,3 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-Test
