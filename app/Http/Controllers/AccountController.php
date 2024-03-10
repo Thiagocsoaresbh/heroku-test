@@ -4,12 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use Illuminate\Http\Request;
+use App\Services\AccountService;
 
 class AccountController extends Controller
 {
+    protected $accountService;
+
+    public function __construct(AccountService $accountService)
+    {
+        $this->accountService = $accountService;
+    }
+
     public function index()
     {
-        return Account::with('user')->get();
+        $accounts = $this->accountService->listAccounts();
+        return response()->json($accounts);
     }
 
     public function store(Request $request)
@@ -20,14 +29,13 @@ class AccountController extends Controller
             'currentBalance' => 'required|numeric|min:0',
         ]);
 
-        $account = Account::create($validatedData);
-
+        $account = $this->accountService->createAccount($validatedData);
         return response()->json($account, 201);
     }
 
     public function show(Account $account)
     {
-        return $account->load('user');
+        return response()->json($account->load('user'));
     }
 
     public function update(Request $request, Account $account)
@@ -36,15 +44,13 @@ class AccountController extends Controller
             'currentBalance' => 'sometimes|required|numeric|min:0',
         ]);
 
-        $account->update($validatedData);
-
-        return response()->json($account);
+        $updatedAccount = $this->accountService->updateAccount($account, $validatedData);
+        return response()->json($updatedAccount);
     }
 
     public function destroy(Account $account)
     {
-        $account->delete();
-
+        $this->accountService->deleteAccount($account);
         return response()->json(null, 204);
     }
 }
