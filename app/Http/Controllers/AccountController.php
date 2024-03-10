@@ -17,7 +17,6 @@ class AccountController extends Controller
 
     public function index(Request $request)
     {
-        // Just listing the user account authenticated
         $accounts = $this->accountService->listAccounts($request->user());
         return response()->json($accounts);
     }
@@ -29,16 +28,12 @@ class AccountController extends Controller
             'currentBalance' => 'required|numeric|min:0',
         ]);
 
-        // Add automatic user_id based in the user
-        $validatedData['user_id'] = $request->user()->id;
-
-        $account = $this->accountService->createAccount($validatedData);
+        $account = $this->accountService->createAccount($validatedData, $request->user());
         return response()->json($account, 201);
     }
 
     public function show(Account $account)
     {
-        // Granting the user can be acess your owns accounts
         $this->authorize('view', $account);
         return response()->json($account->load('user'));
     }
@@ -71,11 +66,7 @@ class AccountController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        // Verify if user have permision to transfer 
-        $fromAccount = Account::findOrFail($validated['fromAccountId']);
-        $this->authorize('transfer', $fromAccount);
-
-        $result = $this->accountService->transferMoney($validated['fromAccountId'], $validated['toAccountId'], $validated['amount']);
+        $result = $this->accountService->transferMoney($validated['fromAccountId'], $validated['toAccountId'], $validated['amount'], $request->user());
 
         if ($result['success']) {
             return response()->json(['message' => $result['message']], 200);
