@@ -2,11 +2,14 @@
 
 namespace Tests\Unit;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class DatabaseReadTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function users_table_exists()
     {
