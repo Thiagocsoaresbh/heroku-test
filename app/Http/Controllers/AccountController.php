@@ -53,4 +53,21 @@ class AccountController extends Controller
         $this->accountService->deleteAccount($account);
         return response()->json(null, 204);
     }
+
+    public function transfer(Request $request)
+    {
+        $validated = $request->validate([
+            'fromAccountId' => 'required|exists:accounts,id',
+            'toAccountId' => 'required|exists:accounts,id',
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        $result = $this->accountService->transferMoney($validated['fromAccountId'], $validated['toAccountId'], $validated['amount']);
+
+        if ($result['success']) {
+            return response()->json($result['message'], 200);
+        } else {
+            return response()->json(['error' => $result['message']], 400);
+        }
+    }
 }
