@@ -43,22 +43,16 @@ Developed with Vue.js, the frontend will provide an interactive interface for us
 ## Author
 
 - **Name**: [Thiago Cesar Soares]
-- **GitHub**: [https://github.com/thiagocsoaresbh]
-- **LinkedIn**: [https://linkedin.com/in/thiago-csoares]
-
-## Contributions
-
-Guidelines for those wishing to contribute to the project, including how to submit bugs, request features, and the process for sending pull requests.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+- **GitHub**: [Github](https://github.com/thiagocsoaresbh)
+- **LinkedIn**: [Linkedin](https://linkedin.com/in/thiago-csoares)
 
 ## Acknowledgments
 
 This README provides a comprehensive overview of the Simplified that Banking System project, detailing the technologies used, database structure, backend and frontend information.
 
+___
 
+#ABOUT LARAVEL
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
