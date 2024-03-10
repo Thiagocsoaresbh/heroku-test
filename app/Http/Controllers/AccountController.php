@@ -17,7 +17,7 @@ class AccountController extends Controller
 
     public function index(Request $request)
     {
-        // Just listen the user account authenticated
+        // Just listing the user account authenticated
         $accounts = $this->accountService->listAccounts($request->user());
         return response()->json($accounts);
     }

@@ -3,18 +3,20 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class AccountService
 {
-    public function createAccount(array $accountData): Account
+    public function createAccount(array $accountData, User $user): Account
     {
+        $accountData['user_id'] = $user->id;
         return Account::create($accountData);
     }
 
-    public function listAccounts()
+    public function listAccounts(User $user)
     {
-        return Account::with('user')->get();
+        return $user->accounts()->with('user')->get();
     }
 
     public function updateAccount(Account $account, array $accountData): Account
@@ -28,15 +30,22 @@ class AccountService
         $account->delete();
     }
 
-    public function transferMoney($fromAccountId, $toAccountId, $amount)
+    public function transferMoney($fromAccountId, $toAccountId, $amount, User $user)
     {
+        if ($fromAccount = Account::find($fromAccountId)) {
+            if ($fromAccount->user_id !== $user->id) {
+                return ['success' => false, 'message' => 'User does not have permission to perform this transfer'];
+            }
+        } else {
+            return ['success' => false, 'message' => 'Source account not found'];
+        }
+
         DB::beginTransaction();
         try {
-            $fromAccount = Account::findOrFail($fromAccountId);
             $toAccount = Account::findOrFail($toAccountId);
 
             if ($fromAccount->currentBalance < $amount) {
-                return ['success' => false, 'message' => 'Saldo insuficiente'];
+                return ['success' => false, 'message' => 'Insufficient funds'];
             }
 
             $fromAccount->currentBalance -= $amount;
@@ -46,10 +55,10 @@ class AccountService
             $toAccount->save();
 
             DB::commit();
-            return ['success' => true, 'message' => 'Transferência realizada com sucesso'];
+            return ['success' => true, 'message' => 'Sucess transfer'];
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['success' => false, 'message' => 'Erro ao realizar transferência: ' . $e->getMessage()];
+            return ['success' => false, 'message' => 'Error to realize transfer'];
         }
     }
 }
