@@ -66,10 +66,17 @@ class AccountController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
+        // Verifying if have balance
+        $fromAccount = Account::findOrFail($validated['fromAccountId']);
+        if ($fromAccount->currentBalance < $validated['amount']) {
+            return response()->json(['error' => 'Insufficient funds'], 400);
+        }
+
+        // Processing the transfer
         $result = $this->accountService->transferMoney($validated['fromAccountId'], $validated['toAccountId'], $validated['amount'], $request->user());
 
         if ($result['success']) {
-            return response()->json(['message' => $result['message']], 200);
+            return response()->json(['message' => $result['message']], 201);
         } else {
             return response()->json(['error' => $result['message']], 400);
         }

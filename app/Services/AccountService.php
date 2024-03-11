@@ -30,24 +30,20 @@ class AccountService
         $account->delete();
     }
 
-    public function transferMoney($fromAccountId, $toAccountId, $amount, User $user)
+    public function transferMoney($fromAccountId, $toAccountId, $amount, $user)
     {
-        if ($fromAccount = Account::find($fromAccountId)) {
-            if ($fromAccount->user_id !== $user->id) {
-                return ['success' => false, 'message' => 'User does not have permission to perform this transfer'];
-            }
-        } else {
-            return ['success' => false, 'message' => 'Source account not found'];
-        }
-
         DB::beginTransaction();
         try {
+            $fromAccount = Account::findOrFail($fromAccountId);
             $toAccount = Account::findOrFail($toAccountId);
 
+            // Verify suficient balance
             if ($fromAccount->currentBalance < $amount) {
+                DB::rollBack();
                 return ['success' => false, 'message' => 'Insufficient funds'];
             }
 
+            // Remove the origin balance and put on destiny account
             $fromAccount->currentBalance -= $amount;
             $fromAccount->save();
 
@@ -55,10 +51,10 @@ class AccountService
             $toAccount->save();
 
             DB::commit();
-            return ['success' => true, 'message' => 'Sucess transfer'];
+            return ['success' => true, 'message' => 'Transfer successful'];
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['success' => false, 'message' => 'Error to realize transfer'];
+            return ['success' => false, 'message' => 'Error processing transfer'];
         }
     }
 }
