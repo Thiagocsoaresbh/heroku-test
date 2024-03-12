@@ -1,4 +1,6 @@
-# PERSONAL NOTE: SET THE CONFIG CORS LATER WHEN IS ONLINE...
+# PERSONAL NOTE: 
+## SET THE CONFIG CORS LATER WHEN IS ONLINE...
+## The providers Policies and Gates
 
 
 # Simplified Banking System
