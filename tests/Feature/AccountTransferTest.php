@@ -29,7 +29,7 @@ class AccountTransferTest extends TestCase
             'amount' => 200,
         ]);
 
-        $response->assertStatus(201); // Adjusting this line to expect status 200
+        $response->assertStatus(201); // Adjusting this line to expect status 201
         $this->assertDatabaseHas('accounts', [
             'id' => $sourceAccount->id,
             'currentBalance' => $sourceAccount->currentBalance - 200, // Confirming the new balance on origin account

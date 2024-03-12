@@ -16,8 +16,37 @@ return [
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
         'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        env('APP_URL') ? ','.parse_url(env('APP_URL'), PHP_URL_HOST) : ''
+        env('APP_URL') ? ',' . parse_url(env('APP_URL'), PHP_URL_HOST) : ''
     ))),
+
+    'stateful' => explode(',', env(
+        'SANCTUM_STATEFUL_DOMAINS',
+        'localhost,localhost:3000,localhost:8080,127.0.0.1,127.0.0.1:8000,::1'
+    )),
+    'expiration' => null,
+    'middleware' => [
+        'verify_csrf_token' => App\Http\Middleware\VerifyCsrfToken::class,
+        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
+    ],
+    'prefix' => '',
+    'domain' => env('SANCTUM_DOMAIN', null),
+    'path' => '/',
+    'http_only' => true,
+    'same_site' => 'lax',
+    'secure' => env('SESSION_SECURE_COOKIE'),
+    'cookie' => env(
+        'SANCTUM_COOKIE',
+        'laravel_session'
+    ),
+    'jwt' => true,
+    'provider' => 'users',
+    'storage_key' => 'user_id',
+    'expiration' => 60 * 24 * 7,
+    'personal_access_token' => [
+        'name' => 'Personal Access Token',
+        'lifetime' => null,
+    ],
+
 
     /*
     |--------------------------------------------------------------------------
