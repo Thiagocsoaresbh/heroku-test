@@ -1,3 +1,5 @@
+# PERSONAL NOTE: SET THE CONFIG CORS LATER WHEN IS ONLINE...
+
 
 # Simplified Banking System
 
