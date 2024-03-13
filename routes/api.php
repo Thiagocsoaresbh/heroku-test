@@ -21,8 +21,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Transactions
     Route::apiResource('/transactions', TransactionController::class);
 
-    // Transfers
+    // Account Transfers
     Route::post('/accounts/transfer', [AccountController::class, 'transfer']);
+    Route::get('/accounts/{account}/transactions', [TransactionController::class, 'index']);
 
     // Checks
     Route::apiResource('/checks', CheckController::class);
