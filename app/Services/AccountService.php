@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
 
 class AccountService
 {
@@ -35,6 +36,32 @@ class AccountService
     public function deleteAccount(Account $account): void
     {
         $account->delete();
+    }
+
+    public function deposit(Request $request, $accountId)
+    {
+        $account = Account::findOrFail($accountId);
+        // Validating and logic for deposit
+        $amount = $request->input('amount');
+        $account->currentBalance += $amount;
+        $account->save();
+
+        return response()->json(['message' => 'Deposit successful', 'balance' => $account->currentBalance]);
+    }
+
+    public function withdraw(Request $request, $accountId)
+    {
+        $account = Account::findOrFail($accountId);
+        // Validating and logic for withdraw
+        $amount = $request->input('amount');
+        // Verify suficient balance
+        if ($account->currentBalance >= $amount) {
+            $account->currentBalance -= $amount;
+            $account->save();
+            return response()->json(['message' => 'Withdrawal successful', 'balance' => $account->currentBalance]);
+        } else {
+            return response()->json(['message' => 'Insufficient funds'], 400);
+        }
     }
 
     public function transferMoney($fromAccountId, $toAccountId, $amount, $user)
