@@ -9,7 +9,9 @@ class TransactionController extends Controller
 {
     public function index()
     {
-        return Transaction::with('account')->get();
+        // Using the 'with' method to eager load the 'account' relationship
+        $transactions = Transaction::with('account.user')->get(); // If need access to the user of the account, we can use the 'account.user' relationship
+        return response()->json($transactions);
     }
 
     public function store(Request $request)
@@ -17,8 +19,8 @@ class TransactionController extends Controller
         $validatedData = $request->validate([
             'account_id' => 'required|exists:accounts,id',
             'type' => 'required|in:income,expense,deposit',
-            'amount' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
+            'amount' => 'required|numeric|min:0.01', // The amount must be a positive number
+            'description' => 'nullable|string|max:255',
             'transactionDate' => 'required|date',
         ]);
 
@@ -29,28 +31,26 @@ class TransactionController extends Controller
 
     public function show(Transaction $transaction)
     {
+        //Carrying out eager loading for the 'account' relationship to optimize the query
         return $transaction->load('account');
     }
 
     public function update(Request $request, Transaction $transaction)
     {
-        // Note: Be careful with allowing updates on transactions, consider business logic.
         $validatedData = $request->validate([
-            'amount' => 'sometimes|required|numeric|min:0',
-            'description' => 'nullable|string',
+            'amount' => 'sometimes|required|numeric|min:0.01', // The amount must be a positive number too when updating
+            'description' => 'nullable|string|max:255',
             'transactionDate' => 'sometimes|required|date',
-        ]);
+        ]); // The 'account_ id' and 'type' fields are not allowed to be updated
 
-        $transaction->update($validatedData);
+        $transaction->update($validatedData); // Updatin the transaction
 
         return response()->json($transaction);
     }
 
     public function destroy(Transaction $transaction)
     {
-        // Consider if you should allow deleting transactions or how it affects account balance.
         $transaction->delete();
-
         return response()->json(null, 204);
     }
 }
