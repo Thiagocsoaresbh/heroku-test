@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class AccountService
 {
@@ -16,8 +17,14 @@ class AccountService
 
     public function listAccounts(User $user)
     {
-        return $user->accounts()->with('user')->get();
+        $key = "accounts.{$user->id}";
+        $seconds = 600; // Implementing cache for 10 minutes
+
+        return Cache::remember($key, $seconds, function () use ($user) {
+            return $user->accounts()->with('user')->get(); // Eager loading
+        });
     }
+
 
     public function updateAccount(Account $account, array $accountData): Account
     {

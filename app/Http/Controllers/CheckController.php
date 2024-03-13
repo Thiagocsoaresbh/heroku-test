@@ -50,4 +50,28 @@ class CheckController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function approveCheck(Request $request, $checkId)
+    {
+        $check = Check::findOrFail($checkId);
+
+        // Veryfing if the user is authorized to approve the check
+        $this->authorize('approve', $check);
+
+        // Logic to approve the check
+        $check->status = 'accepted';
+        $check->save();
+
+        return response()->json(['message' => 'Check approved successfully']);
+    }
+    public function rejectCheck(Request $request, $checkId)
+    {
+        $check = Check::findOrFail($checkId);
+        // Veryfing if the user is authorized to reject the check
+        $this->authorize('reject', $check);
+        // Logic to reject the check
+        $check->status = 'rejected';
+        $check->save();
+        return response()->json(['message' => 'Check rejected successfully']);
+    }
 }
