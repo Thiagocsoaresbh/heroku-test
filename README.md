@@ -3,6 +3,10 @@
 ## The providers Policies and Gates
 
 
+sudo service postresql start
+sudo service redis-server start
+php artisan serve
+
 # Simplified Banking System
 
 ## About the Project

@@ -16,6 +16,9 @@ class AdminController extends Controller
     public function approveCheck(Request $request, $checkId)
     {
         $check = Check::findOrFail($checkId);
+        // Verify if the user has permission to approve the check
+        $this->authorize('approve', $check);
+
         $check->status = 'accepted';
         $check->save();
 
@@ -25,6 +28,9 @@ class AdminController extends Controller
     public function rejectCheck(Request $request, $checkId)
     {
         $check = Check::findOrFail($checkId);
+        // Verify if the user has permission to reject the check
+        $this->authorize('reject', $check);
+
         $check->status = 'rejected';
         $check->save();
 

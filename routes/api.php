@@ -8,6 +8,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CheckController;
 use App\Http\Controllers\AdminController;
 
+
 // Authentication
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -29,7 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/checks', CheckController::class);
 
     // Specific operations
-    Route::post('/accounts/{account}/deposit', [AccountController::class, 'deposit']);
+    Route::post('/accounts/{account}/deposit', [AccountController::class, 'deposit'])->middleware('auth:sanctum');
+    Route::post('/accounts/deposit', [AccountController::class, 'deposit']);
     Route::post('/accounts/{account}/withdraw', [AccountController::class, 'withdraw']);
     Route::get('/accounts/{account}/balance', [AccountController::class, 'balance']);
 

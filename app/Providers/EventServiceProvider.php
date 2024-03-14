@@ -18,6 +18,15 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        'account.created' => [
+            'App\Listeners\AccountCacheInvalidator',
+        ],
+        'account.updated' => [
+            'App\Listeners\AccountCacheInvalidator',
+        ],
+        'account.deleted' => [
+            'App\Listeners\AccountCacheInvalidator',
+        ],
     ];
 
     /**
@@ -27,6 +36,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        parent::boot();
     }
 }

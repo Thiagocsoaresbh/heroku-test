@@ -19,7 +19,7 @@ class AccountService
     public function listAccounts(User $user)
     {
         $key = "accounts.{$user->id}";
-        $seconds = 600; // Implementing cache for 10 minutes
+        $seconds = 300; // Implementing cache for 5 minutes
 
         return Cache::remember($key, $seconds, function () use ($user) {
             return $user->accounts()->with('user')->get(); // Eager loading
@@ -41,12 +41,11 @@ class AccountService
     public function deposit(Request $request, $accountId)
     {
         $account = Account::findOrFail($accountId);
-        // Validating and logic for deposit
         $amount = $request->input('amount');
         $account->currentBalance += $amount;
         $account->save();
 
-        return response()->json(['message' => 'Deposit successful', 'balance' => $account->currentBalance]);
+        return response()->json(['message' => 'Deposit successful', 'balance' => $account->currentBalance], 200);
     }
 
     public function withdraw(Request $request, $accountId)

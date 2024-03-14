@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Services\AccountService;
+use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
 {
@@ -66,13 +67,6 @@ class AccountController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        // Verifying if have balance
-        $fromAccount = Account::findOrFail($validated['fromAccountId']);
-        if ($fromAccount->currentBalance < $validated['amount']) {
-            return response()->json(['error' => 'Insufficient funds'], 400);
-        }
-
-        // Processing the transfer
         $result = $this->accountService->transferMoney($validated['fromAccountId'], $validated['toAccountId'], $validated['amount'], $request->user());
 
         if ($result['success']) {
@@ -80,5 +74,19 @@ class AccountController extends Controller
         } else {
             return response()->json(['error' => $result['message']], 400);
         }
+    }
+
+    // Implement the deposit method
+    public function deposit(Request $request, $accountId)
+    {
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        return $this->accountService->deposit($request, $accountId);
     }
 }

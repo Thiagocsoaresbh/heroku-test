@@ -17,7 +17,7 @@ class AddIndexesToTransactionsTable extends Migration
     public function down()
     {
         Schema::table('transactions', function (Blueprint $table) {
-            // Remove index for 'account_id'
+            // Remove index for 'account_id'php
             $table->dropIndex(['account_id']);
         });
     }
