@@ -43,4 +43,11 @@ class Account extends Model
     {
         return $this->hasMany(Check::class);
     }
+
+    public function getCurrentBalanceAttribute()
+    {
+        return $this->transactions->reduce(function ($carry, $transaction) {
+            return $transaction->type === 'deposit' ? $carry + $transaction->amount : $carry - $transaction->amount;
+        }, 0);
+    }
 }

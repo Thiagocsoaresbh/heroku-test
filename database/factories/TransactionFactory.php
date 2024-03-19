@@ -12,9 +12,8 @@ class TransactionFactory extends Factory
     public function definition()
     {
         return [
-            'account_id' => \App\Models\Account::factory(), // This will create a new account and return the id of the created account
             'type' => $this->faker->randomElement(['income', 'expense', 'deposit']),
-            'amount' => $this->faker->numberBetween(100, 5000), // Generate a random number between 100 and 5000 now
+            'amount' => $this->faker->numberBetween(100, 5000),
             'description' => $this->faker->sentence,
             'transactionDate' => $this->faker->dateTimeThisYear(),
         ];

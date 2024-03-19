@@ -8,6 +8,8 @@ class AccountCacheInvalidator
 {
     public function handle($event)
     {
-        Cache::forget('accounts.' . $event->account->user_id);
+        if ($event->account && $event->account->user_id) {
+            Cache::forget('accounts.' . $event->account->user_id);
+        }
     }
 }

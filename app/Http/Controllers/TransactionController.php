@@ -53,4 +53,20 @@ class TransactionController extends Controller
         $transaction->delete();
         return response()->json(null, 204);
     }
+
+    public function incomes()
+    {
+        $transactions = Transaction::with('account')
+            ->where('type', '=', 'income')
+            ->get();
+        return response()->json($transactions);
+    }
+
+    public function expenses()
+    {
+        $transactions = Transaction::with('account')
+            ->where('type', '=', 'expense')
+            ->get();
+        return response()->json($transactions);
+    }
 }

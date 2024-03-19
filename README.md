@@ -1,9 +1,11 @@
 # PERSONAL NOTE: 
 ## SET THE CONFIG CORS LATER WHEN IS ONLINE...
 ## The providers Policies and Gates
+Use later the middleware throttle to limit the users tryes do connect
+Remember to clean the console logs, dd...
 
 
-sudo service postresql start
+sudo service postgresql start
 sudo service redis-server start
 php artisan serve
 

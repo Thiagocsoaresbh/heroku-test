@@ -21,13 +21,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Transactions
     Route::apiResource('/transactions', TransactionController::class);
+    Route::get('/transactions/incomes', [TransactionController::class, 'incomes']);
+    Route::get('/transactions/expenses', [TransactionController::class, 'expenses']);
 
     // Account Transfers
-    Route::post('/accounts/transfer', [AccountController::class, 'transfer']);
+    Route::post('/accounts/transfer', [AccountController::class, 'transfer'])->middleware('verify.balance');
     Route::get('/accounts/{account}/transactions', [TransactionController::class, 'index']);
 
     // Checks
     Route::apiResource('/checks', CheckController::class);
+    Route::get('/checks/status/{status}', [CheckController::class, 'checksByStatus']);
 
     // Specific operations
     Route::post('/accounts/{account}/deposit', [AccountController::class, 'deposit'])->middleware('auth:sanctum');

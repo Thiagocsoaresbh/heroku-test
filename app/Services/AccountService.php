@@ -42,8 +42,16 @@ class AccountService
     {
         $account = Account::findOrFail($accountId);
         $amount = $request->input('amount');
-        $account->currentBalance += $amount;
-        $account->save();
+
+        DB::transaction(function () use ($account, $amount) {
+            $account->increment('currentBalance', $amount);
+            $account->transactions()->create([
+                'type' => 'deposit',
+                'amount' => $amount,
+                'description' => 'Deposit made to the account',
+                'transactionDate' => now(),
+            ]);
+        });
 
         return response()->json(['message' => 'Deposit successful', 'balance' => $account->currentBalance], 200);
     }
@@ -51,16 +59,24 @@ class AccountService
     public function withdraw(Request $request, $accountId)
     {
         $account = Account::findOrFail($accountId);
-        // Validating and logic for withdraw
         $amount = $request->input('amount');
-        // Verify suficient balance
-        if ($account->currentBalance >= $amount) {
-            $account->currentBalance -= $amount;
-            $account->save();
+
+        return DB::transaction(function () use ($account, $amount) {
+            if ($account->currentBalance < $amount) {
+                return response()->json(['message' => 'Insufficient funds'], 400);
+            }
+
+            $account->decrement('currentBalance', $amount);
+
+            $account->transactions()->create([
+                'type' => 'withdrawal',
+                'amount' => $amount,
+                'description' => 'Withdrawal from the account',
+                'transactionDate' => now(),
+            ]);
+
             return response()->json(['message' => 'Withdrawal successful', 'balance' => $account->currentBalance]);
-        } else {
-            return response()->json(['message' => 'Insufficient funds'], 400);
-        }
+        });
     }
 
     public function transferMoney($fromAccountId, $toAccountId, $amount, $user)

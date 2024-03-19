@@ -8,8 +8,12 @@ class AccountSeeder extends Seeder
 {
     public function run()
     {
+        // Assuring that the 'accounts' table is empty
         \App\Models\User::all()->each(function ($user) {
-            $user->accounts()->save(\App\Models\Account::factory()->make());
+            // using the 'create' method to create a new account for each user
+            $user->accounts()->create(
+                \App\Models\Account::factory()->raw() // 'raw' generate an array of attributes''
+            );
         });
     }
 }

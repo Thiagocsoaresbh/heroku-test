@@ -74,4 +74,9 @@ class CheckController extends Controller
         $check->save();
         return response()->json(['message' => 'Check rejected successfully']);
     }
+    public function checksByStatus($status)
+    {
+        $checks = Check::where('status', $status)->get();
+        return response()->json($checks);
+    }
 }
