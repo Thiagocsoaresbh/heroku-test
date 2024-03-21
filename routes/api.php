@@ -11,47 +11,25 @@ use App\Http\Controllers\AdminController;
 // Authentication
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/sanctum/token', [AuthController::class, 'createToken']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-Route::post('/sanctum/token', [AuthController::class, 'createToken']); // New route for creating token
 
-// Protected routes (require authentication)
+// Route::post('/sanctum/token/revoke', [AuthController::class, 'revokeToken'])->middleware('auth:sanctum');
+
+// Rotas protegidas por autenticação
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
     Route::apiResource('/accounts', AccountController::class);
     Route::apiResource('/transactions', TransactionController::class);
-<<<<<<< HEAD
-    Route::get('/transactions/incomes', [TransactionController::class, 'incomes']);
-    Route::get('/transactions/expenses', [TransactionController::class, 'expenses']);
-
-    // Account Transfers
-    Route::post('/accounts/transfer', [AccountController::class, 'transfer'])->middleware('verify.balance');
-=======
-<<<<<<< Updated upstream
-
-    // Account Transfers
-    Route::post('/accounts/transfer', [AccountController::class, 'transfer']);
-=======
     Route::get('/transactions/incomes', [TransactionController::class, 'incomes']);
     Route::get('/transactions/expenses', [TransactionController::class, 'expenses']);
     Route::post('/accounts/transfer', [AccountController::class, 'transfer'])->middleware('verify.balance');
->>>>>>> Stashed changes
->>>>>>> dev
     Route::get('/accounts/{account}/transactions', [TransactionController::class, 'index']);
     Route::apiResource('/checks', CheckController::class);
-<<<<<<< HEAD
-    Route::get('/checks/status/{status}', [CheckController::class, 'checksByStatus']);
-=======
-<<<<<<< Updated upstream
->>>>>>> dev
-
-    // Specific operations
-    Route::post('/accounts/{account}/deposit', [AccountController::class, 'deposit'])->middleware('auth:sanctum');
-=======
     Route::get('/checks/status/{status}', [CheckController::class, 'checksByStatus']);
     Route::post('/accounts/{account}/deposit', [AccountController::class, 'deposit']);
->>>>>>> Stashed changes
     Route::post('/accounts/deposit', [AccountController::class, 'deposit']);
     Route::post('/accounts/{account}/withdraw', [AccountController::class, 'withdraw']);
     Route::get('/accounts/{account}/balance', [AccountController::class, 'balance']);

@@ -1,18 +1,10 @@
 # PERSONAL NOTE: 
 ## SET THE CONFIG CORS LATER WHEN IS ONLINE...
 ## The providers Policies and Gates
-<<<<<<< HEAD
-Use later the middleware throttle to limit the users tryes do connect
-Remember to clean the console logs, dd...
-=======
-<<<<<<< Updated upstream
-=======
+
 Use later the middleware throttle to limit the users tryes do connect
 Remember to clean the console logs, dd...
 Laravel WebSockets
->>>>>>> Stashed changes
->>>>>>> dev
-
 
 sudo service postgresql start
 sudo service redis-server start
