@@ -53,4 +53,21 @@ class TransactionController extends Controller
         $transaction->delete();
         return response()->json(null, 204);
     }
+<<<<<<< Updated upstream
+=======
+
+    public function incomes(Request $request)
+    {
+        $userId = $request->user()->id;
+        $incomes = Transaction::where('user_id', $userId)->where('type', 'income')->get();
+        return response()->json($incomes);
+    }
+
+    public function expenses(Request $request)
+    {
+        $userId = $request->user()->id;
+        $expenses = Transaction::where('user_id', $userId)->where('type', 'expense')->get();
+        return response()->json($expenses);
+    }
+>>>>>>> Stashed changes
 }
