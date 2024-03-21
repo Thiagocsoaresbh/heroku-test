@@ -6,6 +6,7 @@ use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Services\AccountService;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
@@ -13,6 +14,8 @@ class AccountController extends Controller
 
     public function __construct(AccountService $accountService)
     {
+        // Ensures that all actions on this controller, except those explicitly listed, require authentication via Sanctum.
+        $this->middleware('auth:sanctum')->except(['getBalance']);
         $this->accountService = $accountService;
     }
 
@@ -76,7 +79,6 @@ class AccountController extends Controller
         }
     }
 
-    // Implement the deposit method
     public function deposit(Request $request, $accountId)
     {
         $validator = Validator::make($request->all(), [
@@ -87,6 +89,18 @@ class AccountController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        Log::info('Deposit request', ['user_id' => $request->user()->id, 'account_id' => $accountId, 'amount' => $request->input('amount')]);
+
         return $this->accountService->deposit($request, $accountId);
+    }
+
+    public function getBalance(Request $request)
+    {
+        // This action is public and does not require authentication
+        $user = $request->user();
+        $accounts = $user->accounts;
+        $totalBalance = $accounts->sum('currentBalance');
+
+        return response()->json(['balance' => $totalBalance]);
     }
 }
