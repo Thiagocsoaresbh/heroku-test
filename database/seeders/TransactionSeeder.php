@@ -10,7 +10,7 @@ class TransactionSeeder extends Seeder
 {
     public function run()
     {
-        // Verify if there are accounts in the database
+        // Verify if there are account in the database
         if (Account::count() == 0) {
             \App\Models\Account::factory(10)->create()->each(function ($account) {
                 Transaction::factory(5)->create(['account_id' => $account->id]);

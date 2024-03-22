@@ -15,7 +15,7 @@ class AccountCreationTest extends TestCase
         /** @var \App\Models\User $user */
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/accounts', [
+        $response = $this->actingAs($user)->postJson('/api/account', [
             'accountNumber' => '123456789',
             'currentBalance' => 1000,
         ]);
@@ -25,7 +25,7 @@ class AccountCreationTest extends TestCase
             'accountNumber' => '123456789',
             'currentBalance' => 1000,
         ]);
-        $this->assertDatabaseHas('accounts', [
+        $this->assertDatabaseHas('account', [
             'user_id' => $user->id,
             'accountNumber' => '123456789',
             'currentBalance' => 1000,

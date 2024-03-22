@@ -14,26 +14,26 @@ class AuthTest extends TestCase
     public function user_can_register()
     {
         $response = $this->post('/api/register', [
-            'username' => 'testUser',
-            'email' => 'test@example.com',
+            'username' => 'testUser2',
+            'email' => 'test2@example.com',
             'password' => 'password',
             'role' => 'customer',
         ]);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
+        $this->assertDatabaseHas('users', ['email' => 'test2@example.com']);
     }
 
     /** @test */
     public function user_can_login()
     {
         $user = User::factory()->create([
-            'email' => 'login@example.com',
+            'email' => 'test@example.com',
             'password' => bcrypt('password'),
         ]);
 
         $response = $this->post('/api/login', [
-            'email' => 'login@example.com',
+            'email' => 'test@example.com',
             'password' => 'password',
         ]);
 
