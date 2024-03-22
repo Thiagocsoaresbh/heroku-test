@@ -53,7 +53,7 @@ class AccountService
             ]);
         });
 
-        return response()->json(['message' => 'Deposit successful', 'balance' => $account->currentBalance], 200);
+        return response()->json(['message' => 'Deposit successful', 'currentBalance' => $account->currentBalance], 200);
     }
 
     public function withdraw(Request $request, $accountId)

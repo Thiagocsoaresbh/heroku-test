@@ -25,9 +25,19 @@ class AuthController extends Controller
             'role' => $validatedData['role'],
         ]);
 
+        $account = $user->accounts()->create([
+            'accountNumber' => 'A gerar número único de conta',
+            'currentBalance' => 0,
+        ]);
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer', 'user' => $user], 201);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+            'account_id' => $account->id,
+        ], 201);
     }
 
     public function login(Request $request)
@@ -42,10 +52,16 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request['email'])->firstOrFail();
+        $account = $user->firstAccount();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer', 'user' => $user]);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+            'account_id' => $account ? $account->id : null,
+        ]);
     }
 
     public function logout(Request $request)

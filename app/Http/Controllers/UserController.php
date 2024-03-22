@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Laravel\Sanctum\Sanctum;
 
 class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['store', 'login']);
+        // Removing the middleware from the store method
+        $this->middleware('auth:sanctum')->except(['store']);
     }
 
     public function index()
@@ -93,27 +93,5 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json(null, 204);
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['error' => 'As credenciais fornecidas são inválidas.'], 401);
-        }
-
-        $user = Auth::user();
-        // ...
-        Sanctum::actingAs($user);
-        $token = Sanctum::createToken($user, ['authToken'])->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
     }
 }

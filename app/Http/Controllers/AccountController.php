@@ -14,7 +14,7 @@ class AccountController extends Controller
 
     public function __construct(AccountService $accountService)
     {
-        // Ensures that all actions on this controller, except those explicitly listed, require authentication via Sanctum.
+
         $this->middleware('auth:sanctum')->except(['getBalance']);
         $this->accountService = $accountService;
     }
@@ -94,13 +94,9 @@ class AccountController extends Controller
         return $this->accountService->deposit($request, $accountId);
     }
 
-    public function getBalance(Request $request)
+    public function getBalance(Request $request, $accountId)
     {
-        // This action is public and does not require authentication
-        $user = $request->user();
-        $accounts = $user->accounts;
-        $totalBalance = $accounts->sum('currentBalance');
-
-        return response()->json(['balance' => $totalBalance]);
+        $account = $request->user()->accounts()->findOrFail($accountId);
+        return response()->json(['currentBalance' => $account->currentBalance]);
     }
 }
