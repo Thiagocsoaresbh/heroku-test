@@ -16,13 +16,13 @@ class AccountService
         return Account::create($accountData);
     }
 
-    public function listAccounts(User $user)
+    public function listAccount(User $user)
     {
-        $key = "accounts.{$user->id}";
+        $key = "account.{$user->id}";
         $seconds = 300; // Implementing cache for 5 minutes
 
         return Cache::remember($key, $seconds, function () use ($user) {
-            return $user->accounts()->with('user')->get(); // Eager loading
+            return $user->account()->with('user')->first(); // Eager loading
         });
     }
 

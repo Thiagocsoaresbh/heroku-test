@@ -13,7 +13,7 @@ class AccountTransferTest extends TestCase
 
     public function test_user_can_transfer_money_to_another_account()
     {
-        // Creating user and accounts
+        // Creating user and account
         $user = User::factory()->create();
         $sourceAccount = Account::factory()->create(['user_id' => $user->id, 'currentBalance' => 500]);
         $destinationAccount = Account::factory()->create(['user_id' => $user->id, 'currentBalance' => 100]);
@@ -23,18 +23,18 @@ class AccountTransferTest extends TestCase
         $sourceAccount->save();
 
         /** @var \App\Models\User $user */
-        $response = $this->actingAs($user)->postJson("/api/accounts/transfer", [
+        $response = $this->actingAs($user)->postJson("/api/account/transfer", [
             'fromAccountId' => $sourceAccount->id,
             'toAccountId' => $destinationAccount->id,
             'amount' => 200,
         ]);
 
         $response->assertStatus(201); // Adjusting this line to expect status 201
-        $this->assertDatabaseHas('accounts', [
+        $this->assertDatabaseHas('account', [
             'id' => $sourceAccount->id,
             'currentBalance' => $sourceAccount->currentBalance - 200, // Confirming the new balance on origin account
         ]);
-        $this->assertDatabaseHas('accounts', [
+        $this->assertDatabaseHas('account', [
             'id' => $destinationAccount->id,
             'currentBalance' => $destinationAccount->currentBalance + 200, // Confirming the new balance on destination account
         ]);

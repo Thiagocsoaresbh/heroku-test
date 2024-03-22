@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\AccountService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class AccountController extends Controller
 {
@@ -14,25 +15,30 @@ class AccountController extends Controller
 
     public function __construct(AccountService $accountService)
     {
-
         $this->middleware('auth:sanctum')->except(['getBalance']);
         $this->accountService = $accountService;
     }
 
+    // Ajuste para listar a conta única do usuário
     public function index(Request $request)
     {
-        $accounts = $this->accountService->listAccounts($request->user());
-        return response()->json($accounts);
+        $account = $this->accountService->listAccount(Auth::user());
+        return response()->json($account);
     }
 
+    // Ajuste para impedir a criação de múltiplas contas por usuário
     public function store(Request $request)
     {
+        if (Auth::user()->account) {
+            return response()->json(['error' => 'User already has an account'], 403);
+        }
+
         $validatedData = $request->validate([
-            'accountNumber' => 'required|unique:accounts',
+            'accountNumber' => 'required|unique:accounts,accountNumber',
             'currentBalance' => 'required|numeric|min:0',
         ]);
 
-        $account = $this->accountService->createAccount($validatedData, $request->user());
+        $account = $this->accountService->createAccount($validatedData, Auth::user());
         return response()->json($account, 201);
     }
 
@@ -65,8 +71,8 @@ class AccountController extends Controller
     public function transfer(Request $request)
     {
         $validated = $request->validate([
-            'fromAccountId' => 'required|exists:accounts,id',
-            'toAccountId' => 'required|exists:accounts,id',
+            'fromAccountId' => 'required|exists:account,id',
+            'toAccountId' => 'required|exists:account,id',
             'amount' => 'required|numeric|min:0.01',
         ]);
 

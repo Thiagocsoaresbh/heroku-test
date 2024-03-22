@@ -26,7 +26,7 @@ class AuthController extends Controller
         ]);
 
         $account = $user->accounts()->create([
-            'accountNumber' => 'A gerar número único de conta',
+            'accountNumber' => 'Generated Automatically',
             'currentBalance' => 0,
         ]);
 

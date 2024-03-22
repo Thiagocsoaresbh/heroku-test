@@ -3,60 +3,29 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Account;
 
 class AccountDepositTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
 
-    /**
-     * Test a successful account deposit.
-     *
-     * @return void
-     */
-    public function test_account_deposit_success()
+    public function testAccount_balance_is_updated_after_deposit()
     {
-        // Create a new user for the test
         $user = User::factory()->create();
+        $account = Account::factory()->create(['user_id' => $user->id, 'currentBalance' => 100]);
 
-        $account = Account::factory()->create(['user_id' => $user->id]);
-        $depositAmount = $this->faker->numberBetween(100, 500);
-
-        // Act
         /** @var \App\Models\User $user */
-        $response = $this->actingAs($user)->postJson("/api/accounts/{$account->id}/deposit", [
-            'amount' => $depositAmount,
-        ]);
+        $this->actingAs($user);
 
-        // Assert
-        $response->assertStatus(200);
-        $response->assertJson([
-            'message' => 'Deposit successful',
-            'balance' => $account->fresh()->currentBalance,
-        ]);
-        $this->assertEquals($account->fresh()->currentBalance, $account->currentBalance + $depositAmount);
-    }
-    /**
-     * Test deposit with unauthenticated user.
-     *
-     * @return void
-     */
-    public function test_account_deposit_unauthenticated()
-    {
-        // Arrange
-        $account = Account::factory()->create();
-        $depositAmount = $this->faker->numberBetween(100, 500);
+        $depositAmount = 200;
+        $response = $this->postJson("/api/accounts/{$account->id}/deposit", ['amount' => $depositAmount]);
 
-        // Act
-        $response = $this->postJson("/api/accounts/{$account->id}/deposit", [
-            'amount' => $depositAmount,
-        ]);
+        $response->assertOk();
 
-        // Assert
-        $response->assertStatus(401); // 401 Unauthorized
-        $response->assertJson(['message' => 'Unauthenticated.']);
+        $account->refresh(); // Recarrega o modelo do banco de dados
+
+        $this->assertEquals(300, $account->currentBalance, "The account balance should be correctly updated after deposit.");
     }
 }

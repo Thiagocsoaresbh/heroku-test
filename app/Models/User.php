@@ -15,19 +15,22 @@ class User extends Authenticatable
     protected $hidden = ['password', 'remember_token'];
     protected $casts = [];
 
-    public function accounts()
+    /**
+     * User has one account.
+     */
+    public function account()
     {
-        return $this->hasMany(Account::class);
+        return $this->hasOne(Account::class);
     }
 
     /**
-     * Verify if the user has accounts.
+     * Verify if the user has an account.
      * 
      * @return bool
      */
-    public function hasAccounts(): bool
+    public function hasAccount(): bool
     {
-        return $this->accounts()->exists();
+        return $this->account()->exists();
     }
 
     /**
@@ -37,6 +40,7 @@ class User extends Authenticatable
      */
     public function firstAccount()
     {
-        return $this->accounts()->first();
+        // Assuming each user only has one account, we can use first() to get it.
+        return $this->account()->first();
     }
 }

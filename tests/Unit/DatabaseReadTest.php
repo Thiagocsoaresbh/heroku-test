@@ -17,9 +17,9 @@ class DatabaseReadTest extends TestCase
     }
 
     /** @test */
-    public function accounts_table_exists()
+    public function account_table_exists()
     {
-        $this->assertTrue(Schema::hasTable('accounts'));
+        $this->assertTrue(Schema::hasTable('account'));
     }
 
     /** @test */
