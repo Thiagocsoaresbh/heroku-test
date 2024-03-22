@@ -21,4 +21,19 @@ class UserCreationTest extends TestCase
             'email' => 'test@example.com',
         ]);
     }
+    public function test_user_cannot_create_multiple_accounts()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('authToken')->plainTextToken;
+
+        // Trying to create an account with the same account number
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/accounts', [
+            'accountNumber' => '123456789',
+            'currentBalance' => 0,
+        ]);
+
+        $response->assertStatus(422); // Another appropriate status code can be used
+    }
 }

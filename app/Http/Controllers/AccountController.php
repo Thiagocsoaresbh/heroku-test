@@ -15,22 +15,20 @@ class AccountController extends Controller
 
     public function __construct(AccountService $accountService)
     {
-        $this->middleware('auth:sanctum')->except(['getBalance']);
+        $this->middleware('auth:sanctum');
         $this->accountService = $accountService;
     }
 
-    // Ajuste para listar a conta única do usuário
     public function index(Request $request)
     {
-        $account = $this->accountService->listAccount(Auth::user());
+        $account = $request->user()->account;
         return response()->json($account);
     }
 
-    // Ajuste para impedir a criação de múltiplas contas por usuário
     public function store(Request $request)
     {
-        if (Auth::user()->account) {
-            return response()->json(['error' => 'User already has an account'], 403);
+        if ($request->user()->account()->exists()) {
+            return response()->json(['error' => 'User already has an account'], 422);
         }
 
         $validatedData = $request->validate([
@@ -38,7 +36,7 @@ class AccountController extends Controller
             'currentBalance' => 'required|numeric|min:0',
         ]);
 
-        $account = $this->accountService->createAccount($validatedData, Auth::user());
+        $account = $this->accountService->createAccount($validatedData, $request->user());
         return response()->json($account, 201);
     }
 
@@ -70,39 +68,58 @@ class AccountController extends Controller
 
     public function transfer(Request $request)
     {
+        $userAccount = $request->user()->account;
+        if (!$userAccount) {
+            return response()->json(['error' => 'No account found for user'], 404);
+        }
+
         $validated = $request->validate([
-            'fromAccountId' => 'required|exists:account,id',
-            'toAccountId' => 'required|exists:account,id',
+            'toAccountId' => 'required|exists:accounts,id',
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        $result = $this->accountService->transferMoney($validated['fromAccountId'], $validated['toAccountId'], $validated['amount'], $request->user());
+        $result = $this->accountService->transferMoney($userAccount->id, $validated['toAccountId'], $validated['amount'], $request->user());
 
-        if ($result['success']) {
-            return response()->json(['message' => $result['message']], 201);
-        } else {
-            return response()->json(['error' => $result['message']], 400);
-        }
+        return $result['success']
+            ? response()->json(['message' => $result['message']], 201)
+            : response()->json(['error' => $result['message']], 400);
     }
 
-    public function deposit(Request $request, $accountId)
+    public function deposit(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $userAccount = $request->user()->account;
+        if (!$userAccount) {
+            return response()->json(['error' => 'No account found for user'], 404);
+        }
+
+        $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        Log::info('Deposit request', ['user_id' => $request->user()->id, 'account_id' => $accountId, 'amount' => $request->input('amount')]);
-
-        return $this->accountService->deposit($request, $accountId);
+        return $this->accountService->deposit($request, $userAccount->id);
     }
 
-    public function getBalance(Request $request, $accountId)
+    public function withdraw(Request $request)
     {
-        $account = $request->user()->accounts()->findOrFail($accountId);
+        $userAccount = $request->user()->account;
+        if (!$userAccount) {
+            return response()->json(['error' => 'No account found for user'], 404);
+        }
+
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        return $this->accountService->withdraw($request, $userAccount->id);
+    }
+
+    public function getBalance(Request $request)
+    {
+        $account = $request->user()->account;
+        if (!$account) {
+            return response()->json(['error' => 'No account found for user'], 404);
+        }
+
         return response()->json(['currentBalance' => $account->currentBalance]);
     }
 }

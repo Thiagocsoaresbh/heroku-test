@@ -25,10 +25,19 @@ class AuthController extends Controller
             'role' => $validatedData['role'],
         ]);
 
-        $account = $user->accounts()->create([
+        $account = $user->account()->create([
             'accountNumber' => 'Generated Automatically',
             'currentBalance' => 0,
         ]);
+
+        if (!$user->hasAccount()) {
+            $account = $user->account()->create([
+                'accountNumber' => 'Generated Automatically',
+                'currentBalance' => 0,
+            ]);
+        } else {
+            return response()->json(['message' => 'User already has an account'], 400);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\User;
 
 class UserRegistrationTest extends TestCase
 {
@@ -32,5 +33,21 @@ class UserRegistrationTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_user_registration_creates_account()
+    {
+        $response = $this->postJson('/api/register', [
+            'username' => 'newuser',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'role' => 'customer',
+        ]);
+
+        $user = User::where('email', 'newuser@example.com')->first();
+
+        $this->assertDatabaseHas('accounts', [
+            'user_id' => $user->id,
+        ]);
     }
 }
