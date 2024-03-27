@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Account;
 
 class AuthController extends Controller
 {
@@ -25,14 +26,9 @@ class AuthController extends Controller
             'role' => $validatedData['role'],
         ]);
 
-        $account = $user->account()->create([
-            'accountNumber' => 'Generated Automatically',
-            'currentBalance' => 0,
-        ]);
-
         if (!$user->hasAccount()) {
             $account = $user->account()->create([
-                'accountNumber' => 'Generated Automatically',
+                'accountNumber' => $this->generateUniqueAccountNumber(),
                 'currentBalance' => 0,
             ]);
         } else {
@@ -48,6 +44,16 @@ class AuthController extends Controller
             'account_id' => $account->id,
         ], 201);
     }
+
+    private function generateUniqueAccountNumber()
+    {
+        do {
+            $number = rand(1000000000, 9999999999);
+        } while (Account::where('accountNumber', $number)->exists());
+
+        return $number;
+    }
+
 
     public function login(Request $request)
     {

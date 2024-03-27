@@ -18,11 +18,21 @@ class VerifyAccountBalance
      */
     public function handle(Request $request, Closure $next, $operation = 'withdraw')
     {
-        $accountId = $request->route('account');
-        $amount = $request->input('amount');
+        $accountId = $request->input('accountId'); // For operations like deposit, the account ID is passed in the request
+
+        if ($operation === 'transfer') {
+            $accountId = $request->input('fromAccountId'); // To transfer, the account ID is the from account
+        } elseif ($operation === 'withdraw') {
+            $accountId = $request->user()->account->id; // To withdraw, the account ID is the authenticated user's account
+        }
+
+        if (!$accountId) {
+            return response()->json(['message' => 'Account ID is missing'], 400);
+        }
+
         $account = Account::findOrFail($accountId);
 
-        if ($operation == 'withdraw' && $account->currentBalance < $amount) {
+        if ($account->currentBalance < $request->input('amount')) {
             return response()->json(['message' => 'Insufficient funds'], 403);
         }
 

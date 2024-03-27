@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Services\AccountService;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 
 class AccountController extends Controller
 {
@@ -96,7 +93,9 @@ class AccountController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        return $this->accountService->deposit($request, $userAccount->id);
+        $response = $this->accountService->deposit($userAccount->id, $validated['amount']);
+
+        return response()->json($response);
     }
 
     public function withdraw(Request $request)
@@ -110,10 +109,10 @@ class AccountController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        return $this->accountService->withdraw($request, $userAccount->id);
+        return $this->accountService->withdraw($request, $userAccount->id, $validated['amount']);
     }
 
-    public function getBalance(Request $request)
+    public function balance(Request $request)
     {
         $account = $request->user()->account;
         if (!$account) {

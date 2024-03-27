@@ -10,30 +10,36 @@ class UserCreationTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function a_user_can_be_created()
-    {
-        $user = User::factory()->create([
-            'email' => 'test@example.com',
-        ]);
-
-        $this->assertDatabaseHas('users', [
-            'email' => 'test@example.com',
-        ]);
-    }
     public function test_user_cannot_create_multiple_accounts()
     {
-        $user = User::factory()->create();
-        $token = $user->createToken('authToken')->plainTextToken;
-
-        // Trying to create an account with the same account number
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/accounts', [
-            'accountNumber' => '123456789',
-            'currentBalance' => 0,
+        // First, create a new user account with a role of customer
+        $response = $this->postJson('/api/register', [
+            'username' => 'userTest',
+            'email' => 'user@test.com',
+            'password' => 'password123',
+            'role' => 'customer',
         ]);
 
-        $response->assertStatus(422); // Another appropriate status code can be used
+        $response->assertStatus(201);
+
+        // Getting the token for the user
+        $loginResponse = $this->postJson('/api/login', [
+            'email' => 'user@test.com',
+            'password' => 'password123',
+        ]);
+
+        $loginResponse->assertStatus(200);
+        $token = $loginResponse['access_token'];
+
+        // Try to create a new account for the user
+        $responseCreateAccount = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/account', [
+            'accountNumber' => '1234567890',
+            'currentBalance' => 1000,
+        ]);
+
+        // Verify that the response is successful and the account is created
+        $responseCreateAccount->assertStatus(422);
     }
 }

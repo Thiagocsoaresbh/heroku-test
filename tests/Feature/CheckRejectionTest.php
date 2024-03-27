@@ -3,20 +3,23 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Check;
 
 class CheckRejectionTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_example()
+    use RefreshDatabase;
+
+    public function test_admin_can_reject_check()
     {
-        $response = $this->get('/');
+        $admin = User::factory()->create(['role' => 'administrator']);
+        $check = Check::factory()->create(['status' => 'pending']);
+
+        $admin = User::factory()->create(['role' => 'administrator'])->first();
+        $response = $this->actingAs($admin, 'sanctum')->postJson("/api/admin/checks/{$check->id}/reject");
 
         $response->assertStatus(200);
+        $this->assertEquals('rejected', $check->fresh()->status);
     }
 }

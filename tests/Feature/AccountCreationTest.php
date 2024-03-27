@@ -25,7 +25,7 @@ class AccountCreationTest extends TestCase
             'accountNumber' => '123456789',
             'currentBalance' => 1000,
         ]);
-        $this->assertDatabaseHas('account', [
+        $this->assertDatabaseHas('accounts', [
             'user_id' => $user->id,
             'accountNumber' => '123456789',
             'currentBalance' => 1000,

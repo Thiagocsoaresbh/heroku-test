@@ -28,7 +28,7 @@ class AccountBalanceReturnTest extends TestCase
         $this->actingAs($user, 'sanctum');
 
         // Make a request to get the account balance
-        $response = $this->getJson("/api/account/{$account->id}/balance");
+        $response = $this->getJson("/api/account/balance");
 
         // Verify that the response contains the current balance
         $response

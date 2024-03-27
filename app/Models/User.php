@@ -40,7 +40,6 @@ class User extends Authenticatable
      */
     public function firstAccount()
     {
-        // Assuming each user only has one account, we can use first() to get it.
         return $this->account()->first();
     }
 }

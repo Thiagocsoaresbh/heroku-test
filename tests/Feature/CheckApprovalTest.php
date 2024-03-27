@@ -3,20 +3,23 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Check;
 
 class CheckApprovalTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_example()
+    use RefreshDatabase;
+
+    public function test_admin_can_approve_check()
     {
-        $response = $this->get('/');
+        $admin = User::factory()->create(['role' => 'administrator']);
+        $check = Check::factory()->create(['status' => 'pending']);
+
+        $admin = User::factory()->create(['role' => 'administrator'])->first();
+        $response = $this->actingAs($admin, 'sanctum')->postJson("/api/admin/checks/{$check->id}/approve");
 
         $response->assertStatus(200);
+        $this->assertEquals('approved', $check->fresh()->status);
     }
 }

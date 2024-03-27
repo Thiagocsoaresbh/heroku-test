@@ -13,30 +13,24 @@ class AccountTransferTest extends TestCase
 
     public function test_user_can_transfer_money_to_another_account()
     {
-        // Creating user and account
         $user = User::factory()->create();
         $sourceAccount = Account::factory()->create(['user_id' => $user->id, 'currentBalance' => 500]);
         $destinationAccount = Account::factory()->create(['user_id' => $user->id, 'currentBalance' => 100]);
 
-        // Adjusting the balance on origin account to ensure it has sufficient amount
-        $sourceAccount->currentBalance += 1000; // Adjusting value to enable transfer
-        $sourceAccount->save();
+        $sourceAccount->increment('currentBalance', 1000); // Melhorando a lógica para adicionar saldo
+        $amount = 200;
 
         /** @var \App\Models\User $user */
         $response = $this->actingAs($user)->postJson("/api/account/transfer", [
             'fromAccountId' => $sourceAccount->id,
             'toAccountId' => $destinationAccount->id,
-            'amount' => 200,
+            'amount' => $amount,
         ]);
 
-        $response->assertStatus(201); // Adjusting this line to expect status 201
-        $this->assertDatabaseHas('account', [
-            'id' => $sourceAccount->id,
-            'currentBalance' => $sourceAccount->currentBalance - 200, // Confirming the new balance on origin account
-        ]);
-        $this->assertDatabaseHas('account', [
-            'id' => $destinationAccount->id,
-            'currentBalance' => $destinationAccount->currentBalance + 200, // Confirming the new balance on destination account
-        ]);
+        $response->assertStatus(201);
+
+        // Usando fresh() para obter o saldo atualizado diretamente do banco de dados
+        $this->assertEquals(1300 - $amount, $sourceAccount->fresh()->currentBalance);
+        $this->assertEquals(100 + $amount, $destinationAccount->fresh()->currentBalance);
     }
 }

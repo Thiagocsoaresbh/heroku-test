@@ -50,4 +50,12 @@ class Account extends Model
             return $transaction->type === 'deposit' ? $carry + $transaction->amount : $carry - $transaction->amount;
         }, 0);
     }
+
+    /**
+     * Get the current balance of the account after refreshing the model from the database.
+     */
+    public function getFreshCurrentBalance()
+    {
+        return $this->fresh()->currentBalance;
+    }
 }

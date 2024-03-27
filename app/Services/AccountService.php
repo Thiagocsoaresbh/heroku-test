@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Exception;
+
 
 class AccountService
 {
@@ -19,13 +21,12 @@ class AccountService
     public function listAccount(User $user)
     {
         $key = "account.{$user->id}";
-        $seconds = 300; // Implementing cache for 5 minutes
+        $seconds = 600; // Implementing cache for 10 minutes
 
         return Cache::remember($key, $seconds, function () use ($user) {
             return $user->account()->with('user')->first(); // Eager loading
         });
     }
-
 
     public function updateAccount(Account $account, array $accountData): Account
     {
@@ -38,22 +39,28 @@ class AccountService
         $account->delete();
     }
 
-    public function deposit(Request $request, $accountId)
+    public function deposit($accountId, $amount)
     {
         $account = Account::findOrFail($accountId);
-        $amount = $request->input('amount');
 
         DB::transaction(function () use ($account, $amount) {
             $account->increment('currentBalance', $amount);
+            $account->refresh();
             $account->transactions()->create([
                 'type' => 'deposit',
                 'amount' => $amount,
                 'description' => 'Deposit made to the account',
                 'transactionDate' => now(),
             ]);
+
+            Cache::forget("account.{$account->user_id}");
         });
 
-        return response()->json(['message' => 'Deposit successful', 'currentBalance' => $account->currentBalance], 200);
+        // Retrive the fresh balance
+        $freshBalance = $account->getFreshCurrentBalance();
+
+        // Return the response
+        return ['message' => 'Deposit successful', 'currentBalance' => $freshBalance];
     }
 
     public function withdraw(Request $request, $accountId)
@@ -79,31 +86,37 @@ class AccountService
         });
     }
 
-    public function transferMoney($fromAccountId, $toAccountId, $amount, $user)
+    public function transferMoney($fromAccountId, $toAccountId, $amount)
     {
-        DB::beginTransaction();
-        try {
+        return DB::transaction(function () use ($fromAccountId, $toAccountId, $amount) {
             $fromAccount = Account::findOrFail($fromAccountId);
             $toAccount = Account::findOrFail($toAccountId);
 
-            // Verify suficient balance
+            // Verify if the account has enough balance to transfer
             if ($fromAccount->currentBalance < $amount) {
-                DB::rollBack();
-                return ['success' => false, 'message' => 'Insufficient funds'];
+                throw new Exception('Insufficient funds.');
             }
 
-            // Remove the origin balance and put on destiny account
-            $fromAccount->currentBalance -= $amount;
-            $fromAccount->save();
+            // Update the balance of both accounts accordingly
+            $fromAccount->decrement('currentBalance', $amount);
+            $toAccount->increment('currentBalance', $amount);
 
-            $toAccount->currentBalance += $amount;
-            $toAccount->save();
+            // Create transactions for both accounts
+            $fromAccount->transactions()->create([
+                'type' => 'transfer_out',
+                'amount' => $amount,
+                'description' => "Transfer to account {$toAccountId}",
+                'transactionDate' => now(),
+            ]);
 
-            DB::commit();
+            $toAccount->transactions()->create([
+                'type' => 'transfer_in',
+                'amount' => $amount,
+                'description' => "Transfer from account {$fromAccountId}",
+                'transactionDate' => now(),
+            ]);
+
             return ['success' => true, 'message' => 'Transfer successful'];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return ['success' => false, 'message' => 'Error processing transfer'];
-        }
+        });
     }
 }
