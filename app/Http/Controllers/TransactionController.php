@@ -32,8 +32,11 @@ class TransactionController extends Controller
             'type' => 'required|in:income,expense,deposit',
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string',
-            'transactionDate' => 'required|date',
+            /** 'transactionDate' => 'required|date', **/
+            //Removed to getr the current date
         ]);
+
+        $validatedData['transactionDate'] = now();
 
         $transaction = $userAccount->transactions()->create($validatedData);
         return response()->json($transaction, 201);

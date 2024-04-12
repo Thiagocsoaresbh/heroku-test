@@ -114,11 +114,12 @@ class AccountController extends Controller
 
     public function balance(Request $request)
     {
-        $account = $request->user()->account;
-        if (!$account) {
-            return response()->json(['error' => 'No account found for user'], 404);
-        }
+        $user = $request->user(); // Extract the user from the request
 
-        return response()->json(['currentBalance' => $account->currentBalance]);
+        $accountId = $user->account->id; // Assuming the user has an account
+
+        $balance = Account::where('id', $accountId)->first()->currentBalance;
+
+        return response()->json(['currentBalance' => $balance]);
     }
 }

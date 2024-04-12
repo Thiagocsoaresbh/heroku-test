@@ -25,7 +25,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['message' => 'Logged out successfully']);
     });
 
-    // Remove the 'account' parameter from routes where it's no longer needed
     Route::get('/account', [AccountController::class, 'index']);
     Route::post('/account', [AccountController::class, 'store']);
     Route::get('/account/balance', [AccountController::class, 'balance']);
@@ -35,12 +34,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/account/transactions/expenses', [TransactionController::class, 'expenses']);
     Route::post('/account/deposit', [AccountController::class, 'deposit']);
     Route::post('/account/withdraw', [AccountController::class, 'withdraw'])->middleware('verify.balance:withdraw');
+    Route::post('/transactions', [TransactionController::class, 'store'])->middleware('auth:sanctum');
+
 
     Route::apiResource('/checks', CheckController::class);
     Route::get('/checks/status/{status}', [CheckController::class, 'checksByStatus']);
 
     // Admin specific routes
-    Route::get('/admin/checks', [AdminController::class, 'listChecks'])->middleware('can:isAdmin');
-    Route::post('/admin/checks/{check}/approve', [AdminController::class, 'approveCheck'])->middleware('can:isAdmin');
-    Route::post('/admin/checks/{check}/reject', [AdminController::class, 'rejectCheck'])->middleware('can:isAdmin');
+    Route::get('/admin/checks', [AdminController::class, 'listChecks']);
+    Route::post('/admin/checks/{check}/accept', [AdminController::class, 'acceptCheck'])->middleware('can:accept,check');
+    Route::post('/admin/checks/{check}/reject', [AdminController::class, 'rejectCheck'])->middleware('can:reject,check');
 });

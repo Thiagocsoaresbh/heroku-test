@@ -5,6 +5,10 @@
 Use later the middleware throttle to limit the users tryes do connect
 Remember to clean the console logs, dd...
 Laravel WebSockets
+CSRF Token later
+
+cve-2024-3094 tODAY FOR CRITICAL VULNERABILITY ABOUT ssh(PESQUISAR)
+lib lzma
 
 sudo service postgresql start
 sudo service redis-server start

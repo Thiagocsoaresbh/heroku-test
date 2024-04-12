@@ -4,33 +4,40 @@ namespace App\Http\Controllers;
 
 use App\Models\Check;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class AdminController extends Controller
 {
     public function listChecks()
     {
+        if (!Gate::allows('isAdmin')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $checks = Check::where('status', 'pending')->get();
         return response()->json($checks);
     }
 
     public function approveCheck(Request $request, $checkId)
     {
-        $check = Check::findOrFail($checkId);
-        // Verify if the user has permission to approve the check
-        $this->authorize('approve', $check);
+        if (!Gate::allows('isAdmin')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
+        $check = Check::findOrFail($checkId);
         $check->status = 'accepted';
         $check->save();
 
-        return response()->json(['message' => 'Check approved successfully']);
+        return response()->json(['message' => 'Check accepted successfully']);
     }
 
     public function rejectCheck(Request $request, $checkId)
     {
-        $check = Check::findOrFail($checkId);
-        // Verify if the user has permission to reject the check
-        $this->authorize('reject', $check);
+        if (!Gate::allows('isAdmin')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
+        $check = Check::findOrFail($checkId);
         $check->status = 'rejected';
         $check->save();
 

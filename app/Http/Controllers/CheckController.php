@@ -74,7 +74,7 @@ class CheckController extends Controller
         $check = Check::where('id', $id)->where('account_id', $user->account->id)->firstOrFail();
         $check->status = 'accepted';
         $check->save();
-        return response()->json(['message' => 'Check approved successfully']);
+        return response()->json(['message' => 'Check accepted successfully']);
     }
 
     public function rejectCheck($id)

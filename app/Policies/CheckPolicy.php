@@ -92,9 +92,9 @@ class CheckPolicy
         //
     }
 
-    public function approve(User $user, Check $check)
+    public function accept(User $user, Check $check)
     {
-        // Just administrators can approve checks
+        // Just administrators can accept checks
         return $user->role === 'administrator';
     }
 
